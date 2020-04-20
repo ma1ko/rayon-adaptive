@@ -48,11 +48,11 @@ fn fully_adaptive_test(v: &[u32], answer: &[u32]) {
                 |(s, i), v2| {
                     let (his, mine) = s[i..].split_at_mut(v2.len());
                     sc.spawn(move |_| {
-                        subgraph("retrieve", v2.len(), || {
-                            for (i, o) in v2.iter().zip(his.iter_mut()) {
-                                *o = *i;
-                            }
-                        })
+                        // subgraph("retrieve", v2.len(), || {
+                        for (i, o) in v2.iter().zip(his.iter_mut()) {
+                            *o = *i;
+                        }
+                        // })
                     });
                     (mine, 0)
                 },

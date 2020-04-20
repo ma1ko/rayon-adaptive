@@ -79,23 +79,25 @@ fn raw_capacity(len: usize) -> usize {
 pub(crate) unsafe fn extract_hashmap_slices<'a, K: Eq + Hash, V, S: BuildHasher>(
     table: &'a HashMap<K, V, S>,
 ) -> (&'a [HashUint], &'a [(K, V)]) {
-    let capacity = raw_capacity(table.capacity());
-    let i: std::collections::hash_map::Iter<'a, K, V> = table.iter();
-    // I feel like satan himself
-    let i = transmute::<std::collections::hash_map::Iter<'a, K, V>, Iter<'a, K, V>>(i);
-    let hashes = std::slice::from_raw_parts(i.iter.raw.hash_start, capacity);
-    let pairs = std::slice::from_raw_parts(i.iter.raw.pair_start, capacity);
-    (hashes, pairs)
+    // let capacity = raw_capacity(table.capacity());
+    // let i: std::collections::hash_map::Iter<'a, K, V> = table.iter();
+    // // I feel like satan himself
+    // let i = transmute::<std::collections::hash_map::Iter<'a, K, V>, Iter<'a, K, V>>(i);
+    // let hashes = std::slice::from_raw_parts(i.iter.raw.hash_start, capacity);
+    // let pairs = std::slice::from_raw_parts(i.iter.raw.pair_start, capacity);
+    // (hashes, pairs)
+    unimplemented!()
 }
 
 pub(crate) unsafe fn extract_hashset_slices<'a, K: Eq + Hash, S: BuildHasher>(
     table: &'a HashSet<K, S>,
 ) -> (&'a [HashUint], &'a [(K, ())]) {
-    let capacity = raw_capacity(table.capacity());
-    let i: std::collections::hash_set::Iter<'a, K> = table.iter();
-    // I feel like satan himself
-    let i = transmute::<std::collections::hash_set::Iter<'a, K>, HashSetIter<'a, K>>(i);
-    let hashes = std::slice::from_raw_parts(i.iter.inner.iter.raw.hash_start, capacity);
-    let pairs = std::slice::from_raw_parts(i.iter.inner.iter.raw.pair_start, capacity);
-    (hashes, pairs)
+    // let capacity = raw_capacity(table.capacity());
+    // let i: std::collections::hash_set::Iter<'a, K> = table.iter();
+    // // I feel like satan himself
+    // let i = transmute::<std::collections::hash_set::Iter<'a, K>, HashSetIter<'a, K>>(i);
+    // let hashes = std::slice::from_raw_parts(i.iter.inner.iter.raw.hash_start, capacity);
+    // let pairs = std::slice::from_raw_parts(i.iter.inner.iter.raw.pair_start, capacity);
+    // (hashes, pairs)
+    unimplemented!()
 }
