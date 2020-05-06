@@ -181,6 +181,48 @@ fn unsafe_very_manual_merge(left: &[u32], right: &[u32], mut output: &mut [u32])
         output.copy_from_slice(&right[right_index..])
     }
 }
+use std::mem;
+use std::ptr;
+
+pub unsafe fn slice_merge(left: &[u32], right: &[u32], buf: &mut [u32]) {
+    let left_end = left.as_ptr().add(left.len());
+    let right_end = right.as_ptr().add(right.len());
+    // let output_end = buf.as_ptr().add(buf.len() + 1);
+    let mut right = right.as_ptr();
+    let mut left = left.as_ptr();
+    let mut output = buf.as_mut_ptr();
+
+    loop {
+        let to_copy = if *left < *right {
+            if left == left_end {
+                break;
+            }
+            get_and_increment(&mut left)
+        } else {
+            if right == right_end {
+                break;
+            }
+            get_and_increment(&mut right)
+        };
+        ptr::copy_nonoverlapping(to_copy, get_and_increment_mut(&mut output), 1);
+    }
+
+    let len = (right_end as usize - right as usize) / mem::size_of::<u32>();
+    ptr::copy_nonoverlapping(right, output, len);
+    let len = (left_end as usize - left as usize) / mem::size_of::<u32>();
+    ptr::copy_nonoverlapping(left, output, len);
+
+    pub unsafe fn get_and_increment(ptr: &mut *const u32) -> *const u32 {
+        let old = *ptr;
+        *ptr = ptr.offset(1);
+        old
+    }
+    pub unsafe fn get_and_increment_mut(ptr: &mut *mut u32) -> *mut u32 {
+        let old = *ptr;
+        *ptr = ptr.offset(1);
+        old
+    }
+}
 
 fn interleaved_input(input_size: u32) -> (Vec<u32>, Vec<u32>, Vec<u32>) {
     let (mut left, mut right): (Vec<_>, Vec<_>) = (0..input_size).tuples().unzip();
@@ -221,6 +263,17 @@ fn merge_benchmarks(c: &mut Criterion) {
 //                },
 //            )
 //        })
+         .with_function("pointer merge", |b, input_size| {
+            b.iter_with_setup(
+                || interleaved_input(*input_size),
+                |(left, right, mut output)| {
+                    unsafe {
+                    slice_merge(&left, &right, &mut output);
+                    }
+                    (left, right, output)
+                },
+            )
+        })
         .with_function("manual slice iter", |b, input_size| {
             b.iter_with_setup(
                 || interleaved_input(*input_size),
