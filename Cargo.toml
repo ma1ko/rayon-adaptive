@@ -23,7 +23,7 @@ itertools="*"
 rand="*"
 time = "0.1"
 smallvec = "*"
-hwloc = "*"
+#hwloc = "*"
 libc = "*"
 crossbeam = "*"
 [[bench]]
